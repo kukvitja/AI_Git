@@ -1,5 +1,13 @@
 import random
 import json
+import sys
+from random import randint
+import os
+import webbrowser
+# from RecognizingСommands import *
+import keyboard
+# import pyautogui
+# from pywinauto.application import Application
 
 import torch
 
@@ -15,8 +23,7 @@ pach_file_train_dataset = "data/traindataset.json"
 #
 # pach_file_remember = "data/memory.json"
 
-# from RecognizingСommands import *
-import keyboard
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -56,7 +63,10 @@ def define_phrase(task):
         for intent in dataset['dataset']:
             if name == intent["name"]:
                 if intent['action'] != "None":
-                    task = eval(intent["action"])(arr_text_input=task.split(), question_text=intent['requests'])
+                    try:
+                        task = eval(intent["action"])(arr_text_input=task.split(), question_text=intent['requests'])
+                    except:
+                        pass
                     if task != None:
                         Sound.talk(task)
                 if len(intent['response']) > 0:
@@ -105,6 +115,53 @@ if __name__ == '__main__':
 
         if 'напомни' in tasks:
             Sound.talk(get_remember(pach_file_remember=pach_file_remember, arr_text_input=tasks.split()))
+
+        elif "интересное" in tasks:
+            driver = init_driver()
+            stories = talk_storis(driver)
+            Sound.talk(stories)
+        elif "приготовься к работе" in tasks:
+            Sound.talk("Выполняю. Можеш пока по курить. Я всё сделаю")
+            start_main_work()
+        elif "сканировать" in tasks or "сканируй" in tasks:
+            Sound.talk("Сканирую")
+            scanner()
+        elif "открой браузер" in tasks:
+            Sound.talk("Открываю")
+            os.startfile(r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe')
+        elif "открой документы" in tasks:
+            Sound.talk("Открываю")
+            os.startfile(r"C:\Users\Viktor\Documents\Doky")
+        elif "открой рабочую папку" in tasks:
+            Sound.talk("Открываю")
+            os.startfile(r"C:\Users\Viktor\Documents\Work")
+        elif "обнови declaration" in tasks:
+            Sound.talk("Обновляю Подождите")
+            os.system(r'D:\MasterD\MDUPDATE.exe a')
+        elif "открой declaration" in tasks:
+            Sound.talk("Открываю програму")
+            os.startfile(r'D:\MasterD\MD-Declaration\DeclPlus.exe')
+        elif "открой мой сайт" in tasks:
+            Sound.talk("Открываю Брокер кх")
+            webbrowser.open_new('https://www.brokerkh.net.ua/')
+        elif "закрой declaration" in tasks:
+            Sound.talk("Закрываю")
+            os.system('TASKKILL /IM DeclPlus.exe')
+        elif "закрой браузер" in tasks:
+            Sound.talk("Закрываю")
+            os.system('TASKKILL /IM chrome.exe')
+        elif "сверни всё" in tasks or "сверни все окна" in tasks:
+            Sound.talk("Свертаю все окна")
+            pyautogui.hotkey('winleft', 'd')
+        elif "найди" in tasks or "найти" in tasks:
+            search(tasks)
+            Sound.talk("Вот что я нашла")
+        # elif "пока" in tasks:
+        #     Sound.talk("Пока мой повелитель")
+        #     sys.exit()
+        elif "выключить комп" in tasks or "выключи комп" in tasks:
+            Sound.talk("Выключаю")
+            os.system('shutdown -s')
 
         elif define_phrase(tasks):
             pass
